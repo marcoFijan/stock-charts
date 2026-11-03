@@ -1,0 +1,14 @@
+:root {
+  --bg-pure-black: #000000;
+  --card-bg: #090a0d;
+  --accent-green: #00ff88;
+  --accent-red: #ff3b5c;
+  --text-main: #f0f4f8;
+  --text-muted: #8a99ad;
+  --border-light: rgba(255, 255, 255, 0.12);
+  --shadow-outer: 6px 6px 14px #000000, -6px -6px 14px #181818;
+  --shadow-inner: inset 4px 4px 8px #000000, inset -4px -4px 8px #141414;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background-color: var(--bg-pure-black); color: var(--text-main); font-family: sans-serif; min-height: 100vh; }

@@ -3,7 +3,7 @@ const nextConfig = {
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
-  reactCompiler: true,
+  reactCompiler: false,
 };
 
 export default nextConfig;

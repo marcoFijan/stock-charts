@@ -1,69 +1,91 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { WATCHLIST_TICKERS } from '../data/stockApi';
+import TickerTape from '../components/organisms/TickerTape/TickerTape';
+import SearchBar from '../components/molecules/SearchBar/SearchBar';
+import StockAccordionCard from '../components/organisms/StockAccordionCard/StockAccordionCard';
+import styles from './page.module.css';
+
+// Immediate fallback so the UI never renders completely blank
+const INITIAL_FALLBACK = WATCHLIST_TICKERS.map(item => ({
+  ...item,
+  price: 100.00,
+  change: 1.25
+}));
 
 export default function Home() {
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('ALL');
+  const [stocksWithData, setStocksWithData] = useState(INITIAL_FALLBACK);
+  const [loading, setLoading] = useState(false);
+
+  const categories = ['ALL', 'TECH', 'SPACE/DEFENSE', 'BIOTECH', 'AI & CLOUD', 'FINTECH'];
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadData() {
+      try {
+        const res = await fetch('/api/stocks');
+        if (!res.ok) throw new Error('Network response was not ok');
+        const data = await res.json();
+        if (isMounted && Array.isArray(data) && data.length > 0) {
+          setStocksWithData(data);
+        }
+      } catch (err) {
+        console.warn('Using fallback stock data due to fetch error:', err);
+      }
+    }
+    loadData();
+    return () => { isMounted = false; };
+  }, []);
+
+  const safeStocks = Array.isArray(stocksWithData) ? stocksWithData : INITIAL_FALLBACK;
+
+  const filtered = safeStocks.filter((s) => {
+    const matchesSearch =
+      (s.ticker && s.ticker.toLowerCase().includes(search.toLowerCase())) ||
+      (s.name && s.name.toLowerCase().includes(search.toLowerCase()));
+    const matchesCategory = category === 'ALL' || s.category === category;
+    return matchesSearch && matchesCategory;
+  });
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.js</code> file.
-          </h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
+    <main className={styles.main}>
+      <TickerTape stocks={safeStocks} />
+
+      <header className={styles.header}>
+        <div className={styles.titleArea}>
+          <h1>NEUMORPHIC STOCKS</h1>
+          <p>Pure Black Neumorphism Dashboard</p>
+        </div>
+
+        <SearchBar value={search} onChange={(e) => setSearch(e.target.value)} />
+
+        <div className={styles.categories}>
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              className={`${styles.catBtn} ${category === cat ? styles.catActive : ''}`}
+              onClick={() => setCategory(cat)}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
+              {cat}
+            </button>
+          ))}
+        </div>
+      </header>
+
+      <section className={styles.stockColumn}>
+        {filtered.length === 0 ? (
+          <p style={{ textAlign: 'center', color: '#8a99ad', padding: '40px' }}>
+            No stocks found matching your search.
           </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+        ) : (
+          filtered.map((stock) => (
+            <StockAccordionCard key={stock.ticker} stock={stock} />
+          ))
+        )}
+      </section>
+    </main>
   );
 }

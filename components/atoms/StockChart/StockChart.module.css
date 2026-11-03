@@ -1,0 +1,14 @@
+.chartCanvasContainer {
+  position: relative;
+  width: 100%;
+  height: 200px; /* Fixed height required for canvas auto-resize */
+}
+
+.chartPlaceholder {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8a99ad;
+  font-size: 0.85rem;
+}

@@ -1,0 +1,2 @@
+.input { background: #060709; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; padding: 10px 16px; color: #fff; font-size: 0.9rem; outline: none; box-shadow: inset 3px 3px 6px #000000, inset -3px -3px 6px #141414; width: 100%; }
+.input:focus { border-color: rgba(255, 255, 255, 0.3); }

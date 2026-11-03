@@ -1,0 +1,14 @@
+.accordionContainer { background: #090a0d; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 16px; box-shadow: 6px 6px 14px #000000, -6px -6px 14px #181818; overflow: hidden; transition: all 0.3s ease; }
+.accordionSummary { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; cursor: pointer; list-style: none; }
+.leftInfo { display: flex; align-items: center; gap: 14px; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; background: #050608; border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: inset 2px 2px 5px #000, inset -2px -2px 5px #141414; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; color: #fff; }
+.ticker { font-size: 1.1rem; font-weight: 700; color: #fff; }
+.name { font-size: 0.8rem; color: #8a99ad; }
+.rightInfo { display: flex; align-items: center; gap: 14px; }
+.price { font-size: 1.1rem; font-weight: 700; color: #fff; }
+.accordionBody { padding: 0 20px 20px 20px; }
+.controlsRow { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.categoryBadge { font-size: 0.7rem; color: #8a99ad; letter-spacing: 1px; }
+.chartWrapper { background: #050608; border-radius: 12px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: inset 0px 0px 18px rgba(0, 0, 0, 0.95), inset 0px 0px 8px rgba(255, 255, 255, 0.03); }
+.mockChartCanvas { height: 200px; display: flex; align-items: center; justify-content: center; }
+.chartPlaceholder { color: #8a99ad; font-size: 0.85rem; }

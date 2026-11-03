@@ -1,0 +1,2 @@
+import styles from './Button.module.css';
+export default function Button({ children, active, isPositive, onClick }) { const activeClass = active ? (isPositive ? styles.activePositive : styles.activeNegative) : ''; return <button className={`${styles.button} ${activeClass}`} onClick={onClick}>{children}</button>; }

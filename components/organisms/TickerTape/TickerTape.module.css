@@ -1,0 +1,9 @@
+.tapeWrapper { width: 100%; overflow: hidden; background: #050608; border-bottom: 1px solid rgba(255, 255, 255, 0.12); padding: 8px 0; }
+.tapeTrack { display: flex; gap: 32px; width: max-content; animation: marquee 30s linear infinite; }
+.tapeTrack:hover { animation-play-state: paused; }
+.tapeItem { display: flex; gap: 8px; font-size: 0.85rem; align-items: center; }
+.symbol { font-weight: 700; color: #fff; }
+.price { color: #8a99ad; }
+.pos { color: #00ff88; font-weight: 600; }
+.neg { color: #ff3b5c; font-weight: 600; }
+@keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
