@@ -11,17 +11,17 @@ export async function GET(request) {
     }
 
     let range = '1d';
-    let interval = '15m';
+    let interval = '2m'; // High-density intraday default
 
-    if (timeframe === '1W') {
-      range = '5d';
-      interval = '1h';
-    } else if (timeframe === '1M') {
+    if (timeframe === '1M') {
       range = '1mo';
-      interval = '1d';
+      interval = '1h'; // Hourly ticks for a dense 1-month view
+    } else if (timeframe === '3M') {
+      range = '3mo';
+      interval = '1d'; // Daily ticks for 3 months
     } else if (timeframe === '1Y') {
       range = '1y';
-      interval = '1wk';
+      interval = '1d'; // ~252 daily ticks for a full year of granular data
     }
 
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=${range}&interval=${interval}`;
@@ -60,7 +60,7 @@ export async function GET(request) {
       const date = new Date(item.time * 1000);
       if (timeframe === '1D') {
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      } else if (timeframe === '1W' || timeframe === '1M') {
+      } else if (timeframe === '1M' || timeframe === '3M') {
         return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
       } else {
         return date.toLocaleDateString([], { month: 'short', day: 'numeric', year: '2-digit' });

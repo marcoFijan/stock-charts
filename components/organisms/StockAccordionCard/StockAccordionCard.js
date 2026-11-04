@@ -8,6 +8,7 @@ import StockChart from '../../atoms/StockChart/StockChart';
 import styles from './StockAccordionCard.module.css';
 
 export default function StockAccordionCard({ stock }) {
+  const [isOpen, setIsOpen] = useState(false);
   const [timeframe, setTimeframe] = useState('1D');
   const [livePrice, setLivePrice] = useState(stock.price);
   const [liveChange, setLiveChange] = useState(stock.change);
@@ -26,7 +27,10 @@ export default function StockAccordionCard({ stock }) {
   const isPositive = liveChange >= 0;
 
   return (
-    <details className={styles.accordionContainer}>
+    <details 
+      className={styles.accordionContainer} 
+      onToggle={(e) => setIsOpen(e.target.open)}
+    >
       <summary className={styles.accordionSummary}>
         <div className={styles.leftInfo}>
           <div className={styles.avatar}>{stock.ticker.substring(0, 2)}</div>
@@ -46,7 +50,7 @@ export default function StockAccordionCard({ stock }) {
       <div className={styles.accordionBody}>
         <div className={styles.controlsRow}>
           <TimeframeSelector
-            timeframes={['1D', '1W', '1M', '1Y']}
+            timeframes={['1D', '1M', '3M', '1Y']}
             selected={timeframe}
             isPositive={isPositive}
             onSelect={setTimeframe}
@@ -55,12 +59,16 @@ export default function StockAccordionCard({ stock }) {
         </div>
 
         <div className={styles.chartWrapper}>
-          <StockChart
-            ticker={stock.ticker}
-            isPositive={isPositive}
-            timeframe={timeframe}
-            currentPrice={livePrice}
-          />
+          {isOpen ? (
+            <StockChart
+              ticker={stock.ticker}
+              isPositive={isPositive}
+              timeframe={timeframe}
+              currentPrice={livePrice}
+            />
+          ) : (
+            <div className={styles.chartPlaceholder}>Expand to view chart</div>
+          )}
         </div>
       </div>
     </details>

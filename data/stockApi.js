@@ -1,4 +1,4 @@
-const API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY || '';
+const API_KEY = process.env.FINNHUB_API_KEY || '';
 
 export const WATCHLIST_TICKERS = [
   { ticker: "SOFI", name: "SoFi Technologies", category: "FINTECH" },
@@ -58,18 +58,19 @@ class ApiQueue {
 const apiQueue = new ApiQueue(250);
 
 export async function fetchStockQuote(symbol) {
-  if (!API_KEY) {
-    return { price: 0, change: 0 };
-  }
-
   return apiQueue.add(async () => {
     try {
-      const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEY}`);
-      if (!res.ok) throw new Error('API limit');
+      const res = await fetch(`/api/quote?symbol=${symbol}`);
+      
+      const contentType = res.headers.get("content-type");
+      if (!res.ok || !contentType || !contentType.includes("application/json")) {
+        throw new Error('Non-JSON response from quote API');
+      }
+
       const data = await res.json();
       return {
-        price: data.c || 0,
-        change: data.dp || 0
+        price: data.price || 0,
+        change: data.change || 0
       };
     } catch {
       return { price: 0, change: 0 };
@@ -101,18 +102,18 @@ export async function fetchStockCandles(symbol, timeframe, currentPrice = 0) {
 function generateAnchoredFallbackCandles(ticker, timeframe, currentPrice) {
   const seed = ticker.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   
-  let count = 12;
-  let stepType = 'hour'; 
+  let count = 78; // High density for 1D (e.g. 5-min intervals)
+  let stepMinutes = 5;
 
-  if (timeframe === '1W') {
-    count = 14;
-    stepType = 'halfday';
-  } else if (timeframe === '1M') {
-    count = 30;
-    stepType = 'day';
+  if (timeframe === '1M') {
+    count = 100;
+    stepMinutes = 4320; // ~3 days per step across a month
+  } else if (timeframe === '3M') {
+    count = 150;
+    stepMinutes = 1440 * 1.5;
   } else if (timeframe === '1Y') {
-    count = 52;
-    stepType = 'week';
+    count = 250; // Full 250 daily trading ticks for the year
+    stepMinutes = 1440; // 1 day per step
   }
 
   const prices = [];
@@ -124,31 +125,22 @@ function generateAnchoredFallbackCandles(ticker, timeframe, currentPrice) {
   for (let i = 0; i < count; i++) {
     let pricePoint;
     if (i === count - 1) {
-      pricePoint = targetPrice;
+      pricePoint = targetPrice; // Final anchor is exact live price
     } else {
-      const wave = Math.sin((seed + i) * 0.4) * volatility;
-      const stepBackOffset = (count - 1 - i) * (targetPrice * 0.003);
+      const wave = Math.sin((seed + i) * 0.3) * volatility;
+      const stepBackOffset = (count - 1 - i) * (targetPrice * 0.001);
       pricePoint = Math.max(1, targetPrice - stepBackOffset + wave);
     }
     
     prices.push(Number(pricePoint.toFixed(2)));
-    const pastDate = new Date(now);
+    const pastDate = new Date(now.getTime() - (count - 1 - i) * stepMinutes * 60 * 1000);
 
-    if (stepType === 'hour') {
-      pastDate.setHours(now.getHours() - (count - 1 - i));
+    if (timeframe === '1D') {
       timestamps.push(pastDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-    } else if (stepType === 'halfday') {
-      pastDate.setHours(now.getHours() - (count - 1 - i) * 12);
+    } else if (timeframe === '1M' || timeframe === '3M') {
       timestamps.push(pastDate.toLocaleDateString([], { month: 'short', day: 'numeric' }));
-    } else if (stepType === 'day') {
-      pastDate.setDate(now.getDate() - (count - 1 - i));
-      timestamps.push(pastDate.toLocaleDateString([], { month: 'short', day: 'numeric' }));
-    } else if (stepType === 'week') {
-      pastDate.setDate(now.getDate() - (count - 1 - i) * 7);
+    } else {
       timestamps.push(pastDate.toLocaleDateString([], { month: 'short', day: 'numeric', year: '2-digit' }));
-    } else if (stepType === 'month') {
-      pastDate.setMonth(now.getMonth() - (count - 1 - i));
-      timestamps.push(pastDate.toLocaleDateString([], { month: 'short', year: '2-digit' }));
     }
   }
 

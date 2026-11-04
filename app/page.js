@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useEffect } from 'react';
 import { WATCHLIST_TICKERS } from '../data/stockApi';
 import TickerTape from '../components/organisms/TickerTape/TickerTape';
@@ -7,7 +6,6 @@ import SearchBar from '../components/molecules/SearchBar/SearchBar';
 import StockAccordionCard from '../components/organisms/StockAccordionCard/StockAccordionCard';
 import styles from './page.module.css';
 
-// Immediate fallback so the UI never renders completely blank
 const INITIAL_FALLBACK = WATCHLIST_TICKERS.map(item => ({
   ...item,
   price: 100.00,
@@ -55,13 +53,7 @@ export default function Home() {
       <TickerTape stocks={safeStocks} />
 
       <header className={styles.header}>
-        <div className={styles.titleArea}>
-          <h1>NEUMORPHIC STOCKS</h1>
-          <p>Pure Black Neumorphism Dashboard</p>
-        </div>
-
         <SearchBar value={search} onChange={(e) => setSearch(e.target.value)} />
-
         <div className={styles.categories}>
           {categories.map((cat) => (
             <button

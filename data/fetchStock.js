@@ -1,10 +1,7 @@
-// data/fetchStock.js
 export async function getStockCandles(symbol, resolution = 'D') {
-  const apiKey = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
-  
-  // Calculate timestamps (UNIX epoch) for historical data
+  const apiKey = process.env.FINNHUB_API_KEY;
   const to = Math.floor(Date.now() / 1000);
-  const from = to - (30 * 24 * 60 * 60); // Past 30 days
+  const from = to - (30 * 24 * 60 * 60);
 
   try {
     const res = await fetch(
@@ -13,9 +10,8 @@ export async function getStockCandles(symbol, resolution = 'D') {
     const data = await res.json();
     
     if (data.s === "ok") {
-      // Map API array to Chart.js format
       return {
-        prices: data.c, // Closing prices
+        prices: data.c,
         timestamps: data.t.map(t => new Date(t * 1000).toLocaleDateString())
       };
     }
